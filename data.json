@@ -1,0 +1,44 @@
+{
+    "pets": [
+        {
+            "name": "Dog",
+            "price": 1000
+        },
+        {
+            "name": "Cat",
+            "price": 800
+        },
+        {
+            "name": "Hamster",
+            "price": 200
+        }
+    ],
+    "books": [
+        {
+            "name": "When Breath Becomes Air",
+            "price": 15.1
+        },
+        {
+            "name": "The Great Gatsby",
+            "price": 10.2
+        },
+        {
+            "name": "The Catcher in the Rye",
+            "price": 12.5
+        }
+    ],
+    "movies": [
+        {
+            "name": "Inside Out 2",
+            "price": 102300
+        },
+        {
+            "name": "Despicable Me 4",
+            "price": 908001
+        },
+        {
+            "name": "How to Make Millions Before Grandma Dies",
+            "price": 232800
+        }
+    ]
+}
