@@ -52,7 +52,7 @@ def prompt(request: HttpRequest):
         if not _table_exists(f"products_{name.strip()}"):
             logger.info(f"Invalid table name: \"{name.strip()}\"")
             break
-        table_names.append(name)
+        table_names.append(name.strip())
     logger.info(f"Table names: {table_names}")
     
     # Get filters from query
