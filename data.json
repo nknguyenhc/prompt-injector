@@ -2,43 +2,61 @@
     "pets": [
         {
             "name": "Dog",
-            "price": 1000
+            "price": 1000,
+            "popularity": "high",
+            "stock_status": "low"
         },
         {
             "name": "Cat",
-            "price": 800
+            "price": 800,
+            "popularity": "high",
+            "stock_status": "medium"
         },
         {
             "name": "Hamster",
-            "price": 200
+            "price": 200,
+            "popularity": "medium",
+            "stock_status": "high"
         }
     ],
     "books": [
         {
             "name": "When Breath Becomes Air",
-            "price": 15.1
+            "price": 15.1,
+            "popularity": "low",
+            "stock_status": "low"
         },
         {
             "name": "The Great Gatsby",
-            "price": 10.2
+            "price": 10.2,
+            "popularity": "medium",
+            "stock_status": "low"
         },
         {
             "name": "The Catcher in the Rye",
-            "price": 12.5
+            "price": 12.5,
+            "popularity": "high",
+            "stock_status": "medium"
         }
     ],
     "movies": [
         {
             "name": "Inside Out 2",
-            "price": 102300
+            "price": 102300,
+            "popularity": "high",
+            "stock_status": "high"
         },
         {
             "name": "Despicable Me 4",
-            "price": 908001
+            "price": 908001,
+            "popularity": "medium",
+            "stock_status": "high"
         },
         {
             "name": "How to Make Millions Before Grandma Dies",
-            "price": 232800
+            "price": 232800,
+            "popularity": "high",
+            "stock_status": "low"
         }
     ]
 }
