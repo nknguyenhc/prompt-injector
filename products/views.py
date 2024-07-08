@@ -1,12 +1,14 @@
-from django.db import connection
+from django.db import connection, models
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.http import require_http_methods
 import logging
+from typing import Type
 
 from .models import Pet, Book, Movie, Flag
 from .agents import Agent, QueryException
 
 logger = logging.getLogger("products.views")
+tables: list[Type[models.Model]] = [Pet, Book, Movie, Flag]
 
 @require_http_methods(["GET"])
 def get_all_products(request: HttpRequest):
@@ -19,10 +21,15 @@ def get_all_products(request: HttpRequest):
         "movies": movies,
     })
 
-def _table_exists(table_name):
+def _table_exists(table_name: str):
     with connection.cursor() as cursor:
         table_names = connection.introspection.table_names(cursor)
         return table_name in table_names
+
+def _get_model_class(table_name: str):
+    for table in tables:
+        if table.objects.model._meta.db_table == table_name:
+            return table
 
 @require_http_methods(["GET"])
 def prompt(request: HttpRequest):
@@ -47,4 +54,44 @@ def prompt(request: HttpRequest):
             break
         table_names.append(name)
     logger.info(f"Table names: {table_names}")
-    return JsonResponse({"tables": table_names})
+    
+    # Get filters from query
+    try:
+        filter_response = Agent("field").query(query=query)
+    except QueryException as e:
+        logger.error(f"Query exception: {e}")
+        return JsonResponse({"error": "LLM error"}, status=400)
+    
+    # Extract filters from response
+    logger.info(f"Filter response:\n{filter_response}")
+    filters = dict()
+    for line in filter_response.split("\n"):
+        if line.strip() == "":
+            logger.warning("Empty line in filter response encountered")
+            continue
+        line_split = line.split("=")
+        if len(line_split) != 2:
+            logger.error(f"Invalid filter line: \"{line}\"")
+            return JsonResponse({"error": "LLM response format error"}, status=400)
+        field_name, field_value = line_split
+        field_name = field_name.strip()
+        field_value = field_value.strip()
+        if field_value.lower() == "none":
+            continue
+        filters[field_name] = field_value
+    
+    # Do DB queries and obtain results
+    logger.info(f"Filters: {filters}")
+    objects = []
+    for table_name in table_names:
+        model = _get_model_class(f"products_{table_name}")
+        if model is None:
+            continue
+        try:
+            new_objects = list(model.objects.filter(**filters).values())
+        except Exception as e:
+            logger.error(f"DB filter exception: {e}")
+            continue
+        objects.extend(new_objects)
+    
+    return JsonResponse({"values": objects})

@@ -6,11 +6,8 @@ The list of possible categories are given in the "categories" tag below.
 
 You are to start your response with the categories you think the user is asking for.
 Each category should be on a separate line.
-If you think none of the categories fit the user query,
-you are to start your response with "None".
-If you think the user is asking for everything,
-you are to start your response with all categories available.
-You are not to format the category in any way.
+You are not to format the categories in any way.
+You are not to format your response as json.
 
 You are then to provide explanation of your answer on the next line.
 </instruction>
