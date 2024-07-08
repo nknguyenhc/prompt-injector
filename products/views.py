@@ -9,6 +9,7 @@ from .agents import Agent, QueryException
 
 logger = logging.getLogger("products.views")
 tables: list[Type[models.Model]] = [Pet, Book, Movie, Flag]
+skipped_lines = ["", "```json", "```"]
 
 @require_http_methods(["GET"])
 def get_all_products(request: HttpRequest):
@@ -47,12 +48,28 @@ def prompt(request: HttpRequest):
         return JsonResponse({"error": "LLM error"}, status=400)
     
     # Extract table names from response
+    logger.info(f"Table response:\n{table_response}")
     table_names: list[str] = []
-    for name in table_response.split("\n"):
-        if not _table_exists(f"products_{name.strip()}"):
-            logger.info(f"Invalid table name: \"{name.strip()}\"")
-            break
-        table_names.append(name.strip())
+    for line in table_response.split("\n"):
+        line = line.strip()
+        if line in skipped_lines:
+            continue
+        line_split = line.split("=")
+        if len(line_split) != 2:
+            logger.error(f"Invalid table line: \"{line}\"")
+            return JsonResponse({"error": "LLM response format error"}, status=400)
+        key, name = line_split
+        key = key.strip()
+        name = name.strip()
+        if key.lower() != "category":
+            logger.error(f"Invalid key: \"{key}\"")
+            return JsonResponse({"error": "LLM response format error"}, status=400)
+        if name.lower() == "none":
+            continue
+        if not _table_exists(f"products_{name}"):
+            logger.info(f"Invalid table name: \"{name}\"")
+            return JsonResponse({"error": "LLM response format error"}, status=400)
+        table_names.append(name)
     logger.info(f"Table names: {table_names}")
     
     # Get filters from query
@@ -65,7 +82,6 @@ def prompt(request: HttpRequest):
     # Extract filters from response
     logger.info(f"Filter response:\n{filter_response}")
     filters = dict()
-    skipped_lines = ["", "```json", "```"]
     for line in filter_response.split("\n"):
         line = line.strip()
         if line in skipped_lines:
