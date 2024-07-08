@@ -65,9 +65,10 @@ def prompt(request: HttpRequest):
     # Extract filters from response
     logger.info(f"Filter response:\n{filter_response}")
     filters = dict()
+    skipped_lines = ["", "```json", "```"]
     for line in filter_response.split("\n"):
-        if line.strip() == "":
-            logger.warning("Empty line in filter response encountered")
+        line = line.strip()
+        if line in skipped_lines:
             continue
         line_split = line.split("=")
         if len(line_split) != 2:
